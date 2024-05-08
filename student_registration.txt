@@ -1,0 +1,5 @@
+Name: Mudassir Riaz
+ID: 01-131232-046
+Email: 01-131232-046@student.bahria.edu.pk
+Selected Courses: Discrete Structures, Object Oriented Programming, Linear Algebra, Introduction to Software Engineering, Islamic Studies
+-----------------------------------
