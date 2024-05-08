@@ -3,7 +3,7 @@ package com.labtasks.task2;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 
@@ -11,78 +11,76 @@ public class AddressBookController {
     @FXML
     private TextField nameField;
     @FXML
-    private TextField phoneNumberField;
+    private TextField phoneField;
     @FXML
     private TextField emailField;
+
     @FXML
-    private TableView<AddressBook.Contact> tableView;
+    private TableView<Contact> contactTable;
+    @FXML
+    private TableColumn<Contact, String> nameColumn;
+    @FXML
+    private TableColumn<Contact, String> phoneColumn;
+    @FXML
+    private TableColumn<Contact, String> emailColumn;
 
-    private ObservableList<AddressBook.Contact> contacts;
+    private ObservableList<Contact> contacts = FXCollections.observableArrayList();
+    private Contact selectedContact;
 
-    public void initialize() {
-        contacts = FXCollections.observableArrayList();
-        tableView.setItems(contacts);
+    @FXML
+    private void initialize() {
+        nameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
+        phoneColumn.setCellValueFactory(cellData -> cellData.getValue().phoneProperty());
+        emailColumn.setCellValueFactory(cellData -> cellData.getValue().emailProperty());
+
+        contactTable.setItems(contacts);
     }
 
     @FXML
-    private void addContact() {
+    private void handleAddContact() {
         String name = nameField.getText();
-        String phoneNumber = phoneNumberField.getText();
+        String phone = phoneField.getText();
         String email = emailField.getText();
 
-        if (!name.isEmpty() && !phoneNumber.isEmpty() && !email.isEmpty()) {
-            AddressBook.Contact contact = new AddressBook.Contact(name, phoneNumber, email);
-            contacts.add(contact);
+        if (!name.isEmpty() && !phone.isEmpty() && !email.isEmpty()) {
+            Contact newContact = new Contact(name, phone, email);
+            contacts.add(newContact);
             clearFields();
-        } else {
-            showAlert("Error", "Please fill in all fields.");
         }
     }
 
     @FXML
-    private void editContact() {
-        AddressBook.Contact selectedContact = tableView.getSelectionModel().getSelectedItem();
+    private void handleEditContact() {
         if (selectedContact != null) {
-            String newName = nameField.getText();
-            String newPhoneNumber = phoneNumberField.getText();
-            String newEmail = emailField.getText();
-
-            if (!newName.isEmpty() && !newPhoneNumber.isEmpty() && !newEmail.isEmpty()) {
-                selectedContact.setName(newName);
-                selectedContact.setPhoneNumber(newPhoneNumber);
-                selectedContact.setEmail(newEmail);
-                tableView.refresh();
-                clearFields();
-            } else {
-                showAlert("Error", "Please fill in all fields.");
-            }
-        } else {
-            showAlert("Error", "No contact selected.");
+            selectedContact.setName(nameField.getText());
+            selectedContact.setPhone(phoneField.getText());
+            selectedContact.setEmail(emailField.getText());
+            contactTable.refresh();
+            clearFields();
         }
     }
 
     @FXML
-    private void deleteContact() {
-        AddressBook.Contact selectedContact = tableView.getSelectionModel().getSelectedItem();
+    private void handleDeleteContact() {
+        int selectedIndex = contactTable.getSelectionModel().getSelectedIndex();
+        if (selectedIndex >= 0) {
+            contactTable.getItems().remove(selectedIndex);
+        }
+    }
+
+    @FXML
+    private void handleContactSelected() {
+        selectedContact = contactTable.getSelectionModel().getSelectedItem();
         if (selectedContact != null) {
-            contacts.remove(selectedContact);
-            clearFields();
-        } else {
-            showAlert("Error", "No contact selected.");
+            nameField.setText(selectedContact.getName());
+            phoneField.setText(selectedContact.getPhone());
+            emailField.setText(selectedContact.getEmail());
         }
     }
 
     private void clearFields() {
         nameField.clear();
-        phoneNumberField.clear();
+        phoneField.clear();
         emailField.clear();
-    }
-
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
     }
 }
